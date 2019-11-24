@@ -1,22 +1,28 @@
 import tweepy
 import time
 import numpy as np
+import random
+import sys
+import os
+def linedel():
+	sys.stdout.write("\033[F") #back to previous line
+	sys.stdout.write("\033[K") #clear line
 def randstring():
-	trump = open('speeches.txt', encoding='utf8').read()
-	corpus = trump.split()
-	def make_pairs(corpus):
-			for i in range(len(corpus)-1):
-					yield (corpus[i], corpus[i+1])
-	pairs = make_pairs(corpus)
+	text = open('noMouth.txt', encoding='utf8').read()
+	training_text = text.split()
+	def make_pairs(training_text):
+			for i in range(len(training_text)-1):
+					yield (training_text[i], training_text[i+1])
+	pairs = make_pairs(training_text)
 	word_dict = {}
 	for word_1, word_2 in pairs:
 			if word_1 in word_dict.keys():
 					word_dict[word_1].append(word_2)
 			else:
 					word_dict[word_1] = [word_2]
-	first_word = np.random.choice(corpus)
+	first_word = np.random.choice(training_text)
 	while first_word.islower():
-			first_word = np.random.choice(corpus)
+			first_word = np.random.choice(training_text)
 	chain = [first_word]
 	n_words = 50
 	for i in range(n_words):
@@ -33,8 +39,19 @@ auth.set_access_token("1184084081593729024-b3hksvhFbyYpNjA6oy9JNjAy3UJUOB", "QPy
 api = tweepy.API(auth)
 amount = 0
 while True:
-	time.sleep(60)
-	string = randstring()
-	if len(string) <= 280:
-		print(string + '\n' + str(len(string)))
-		api.update_status(string)
+	n = random.randint(10,120)
+	string = randstring().lower()
+	string = string.capitalize() + '.'
+	if len(string) <= 278:
+		print(string + '\n' + 'length: %s'%len(string))
+		while n > 0:
+			print (n)
+			linedel()
+			time.sleep(1)
+			n = n - 1
+			if n ==0:
+				api.update_status(string)
+				print('tweet made')
+				time.sleep(5)
+				cls = lambda: os.system('clear')
+				cls()
